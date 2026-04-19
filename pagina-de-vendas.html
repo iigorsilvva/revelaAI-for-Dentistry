@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agenda Barber Pro — Sistema de Agendamento para Barbearia</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#C8922A;--gold-l:#E5B850;--gold-d:#8A6218;
+  --ink:#080806;--ink2:#0F0E0C;--ink3:#181512;--ink4:#201D19;
+  --cream:#F2EBD9;--c2:#B5A48A;--c3:#726254;--c4:#3D3228;
+  --bdr:#2C2820;--grn:#3D8B5E;--red:#C94040;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--ink);color:var(--cream);overflow-x:hidden;line-height:1.6}
+
+/* ── ANIMAÇÕES ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes shine{0%{left:-100%}100%{left:200%}}
+@keyframes countUp{from{opacity:0}to{opacity:1}}
+.fade-up{opacity:0;animation:fadeUp .8s ease forwards}
+.delay-1{animation-delay:.1s}.delay-2{animation-delay:.2s}.delay-3{animation-delay:.3s}.delay-4{animation-delay:.4s}.delay-5{animation-delay:.5s}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;background:rgba(8,8,6,.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(200,146,42,.15)}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.1em;color:var(--cream)}
+.nav-logo span{color:var(--gold)}
+.nav-cta{font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:.12em;background:var(--gold);color:var(--ink);padding:.45rem 1.4rem;border:none;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block}
+.nav-cta:hover{background:var(--gold-l);transform:translateY(-1px)}
+
+/* ── HERO ── */
+.hero{min-height:100vh;display:flex;align-items:center;padding-top:64px;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 40%,rgba(200,146,42,.08) 0%,transparent 70%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(200,146,42,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(200,146,42,.04) 1px,transparent 1px);background-size:60px 60px}
+.hero-inner{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:4rem 2rem;text-align:center}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(200,146,42,.12);border:1px solid rgba(200,146,42,.3);padding:.4rem 1.1rem;font-size:.75rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:2rem}
+.hero-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse 1.5s infinite}
+.hero-h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,6.5rem);line-height:.92;letter-spacing:.02em;margin-bottom:1.5rem}
+.hero-h1 .gld{color:var(--gold)}
+.hero-h1 .stk{-webkit-text-stroke:1.5px var(--c3);color:transparent}
+.hero-sub{font-size:1.15rem;color:var(--c2);max-width:560px;margin:0 auto 2.5rem;line-height:1.8;font-weight:300}
+.hero-sub strong{color:var(--cream);font-weight:500}
+.hero-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-bottom:3rem}
+.btn-primary{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.14em;background:var(--gold);color:var(--ink);padding:.85rem 2.5rem;border:none;cursor:pointer;position:relative;overflow:hidden;transition:all .2s;text-decoration:none;display:inline-block}
+.btn-primary::before{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:rgba(255,255,255,.2);transform:skewX(-20deg);animation:shine 2.5s infinite}
+.btn-primary:hover{background:var(--gold-l);transform:translateY(-2px)}
+.btn-secondary{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.14em;background:transparent;color:var(--cream);padding:.85rem 2.5rem;border:1px solid var(--bdr);cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block}
+.btn-secondary:hover{border-color:var(--gold);color:var(--gold)}
+.hero-stats{display:flex;justify-content:center;gap:0;flex-wrap:wrap}
+.hstat{padding:1rem 2rem;border:1px solid var(--bdr);border-right:none;text-align:center}
+.hstat:last-child{border-right:1px solid var(--bdr)}
+.hstat-n{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--gold);letter-spacing:.04em}
+.hstat-l{font-size:.7rem;color:var(--c3);text-transform:uppercase;letter-spacing:.1em}
+
+/* ── DOR ── */
+.pain{padding:6rem 2rem;background:var(--ink2);position:relative;overflow:hidden}
+.pain::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.pain-inner{max-width:900px;margin:0 auto;text-align:center}
+.section-label{font-family:'Bebas Neue',sans-serif;font-size:.75rem;letter-spacing:.22em;color:var(--gold);margin-bottom:.75rem;display:flex;align-items:center;justify-content:center;gap:.75rem}
+.section-label::before,.section-label::after{content:'';width:32px;height:1px;background:var(--gold)}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,5vw,3.5rem);letter-spacing:.04em;line-height:.95;margin-bottom:1.25rem}
+.section-sub{color:var(--c2);font-size:1rem;max-width:560px;margin:0 auto 3rem;line-height:1.8;font-weight:300}
+.pain-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1px;background:var(--bdr)}
+.pain-item{background:var(--ink3);padding:2rem;text-align:left}
+.pain-icon{font-size:2rem;margin-bottom:1rem}
+.pain-title{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.06em;color:var(--red);margin-bottom:.5rem}
+.pain-text{font-size:.85rem;color:var(--c3);line-height:1.7;font-weight:300}
+
+/* ── SOLUÇÃO ── */
+.solution{padding:6rem 2rem;background:var(--ink)}
+.sol-inner{max-width:1100px;margin:0 auto}
+.sol-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1px;background:var(--bdr);margin-top:3rem}
+.sol-item{background:var(--ink2);padding:2rem;position:relative;overflow:hidden;transition:background .25s}
+.sol-item::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:.3s}
+.sol-item:hover{background:var(--ink3)}
+.sol-item:hover::after{transform:scaleX(1)}
+.sol-num{font-family:'Bebas Neue',sans-serif;font-size:3rem;color:var(--ink4);line-height:1;margin-bottom:.75rem}
+.sol-icon{font-size:1.8rem;margin-bottom:.75rem}
+.sol-title{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.06em;margin-bottom:.5rem;color:var(--gold)}
+.sol-text{font-size:.85rem;color:var(--c3);line-height:1.75;font-weight:300}
+
+/* ── DEMONSTRAÇÃO ── */
+.demo{padding:6rem 2rem;background:var(--ink2);position:relative;overflow:hidden}
+.demo::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.demo-inner{max-width:900px;margin:0 auto;text-align:center}
+.mockup{background:var(--ink3);border:1px solid var(--bdr);margin:3rem auto 0;max-width:600px;padding:2rem}
+.mockup-bar{display:flex;gap:.5rem;margin-bottom:1.5rem;align-items:center}
+.mockup-dot{width:10px;height:10px;border-radius:50%}
+.mockup-dot:nth-child(1){background:#ff5f57}
+.mockup-dot:nth-child(2){background:#ffbd2e}
+.mockup-dot:nth-child(3){background:#28c840}
+.mockup-url{flex:1;background:var(--ink4);border:1px solid var(--bdr);padding:.3rem .75rem;font-size:.72rem;color:var(--c3);text-align:center}
+.mockup-content{display:flex;flex-direction:column;gap:.75rem}
+.mockup-step{display:flex;align-items:center;gap:.85rem;background:var(--ink4);border:1px solid var(--bdr);padding:.85rem 1rem;text-align:left}
+.mockup-step.active{border-color:var(--gold);background:rgba(200,146,42,.06)}
+.step-num{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--gold);min-width:28px}
+.step-info{flex:1}
+.step-title{font-size:.85rem;font-weight:500;margin-bottom:.1rem}
+.step-sub{font-size:.72rem;color:var(--c3)}
+.step-check{color:var(--grn);font-size:.9rem}
+
+/* ── PREÇO ── */
+.pricing{padding:6rem 2rem;background:var(--ink);position:relative}
+.pricing-inner{max-width:700px;margin:0 auto;text-align:center}
+.price-card{background:var(--ink2);border:2px solid var(--gold);padding:3rem 2.5rem;margin-top:3rem;position:relative}
+.price-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--gold);color:var(--ink);font-family:'Bebas Neue',sans-serif;font-size:.8rem;letter-spacing:.12em;padding:.3rem 1.25rem;white-space:nowrap}
+.price-name{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.08em;margin-bottom:.5rem}
+.price-val{font-family:'Bebas Neue',sans-serif;font-size:5rem;color:var(--gold);line-height:1;letter-spacing:.02em}
+.price-val sup{font-size:1.8rem;vertical-align:top;margin-top:.8rem;display:inline-block}
+.price-val sub{font-size:1rem;color:var(--c2)}
+.price-desc{color:var(--c2);font-size:.88rem;margin:1rem 0 2rem;font-weight:300}
+.price-features{display:flex;flex-direction:column;gap:.65rem;margin-bottom:2rem;text-align:left}
+.pf{display:flex;align-items:center;gap:.75rem;font-size:.9rem}
+.pf-check{color:var(--grn);font-size:1rem;min-width:18px}
+.price-cta{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.14em;background:var(--gold);color:var(--ink);padding:1rem 3rem;border:none;cursor:pointer;width:100%;position:relative;overflow:hidden;transition:all .2s;text-decoration:none;display:block;margin-bottom:.85rem}
+.price-cta::before{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:rgba(255,255,255,.2);transform:skewX(-20deg);animation:shine 2s infinite}
+.price-cta:hover{background:var(--gold-l)}
+.price-guarantee{font-size:.78rem;color:var(--c3);display:flex;align-items:center;justify-content:center;gap:.5rem}
+
+/* ── URGÊNCIA ── */
+.urgency{padding:4rem 2rem;background:rgba(200,146,42,.08);border-top:1px solid rgba(200,146,42,.2);border-bottom:1px solid rgba(200,146,42,.2);text-align:center}
+.urgency-inner{max-width:700px;margin:0 auto}
+.urgency-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.8rem,4vw,2.8rem);letter-spacing:.04em;margin-bottom:.75rem}
+.urgency-sub{color:var(--c2);font-size:.95rem;font-weight:300;margin-bottom:1.75rem}
+.timer{display:flex;justify-content:center;gap:1rem;margin-bottom:2rem}
+.timer-unit{text-align:center}
+.timer-num{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:var(--gold);letter-spacing:.04em;background:var(--ink2);border:1px solid var(--bdr);padding:.5rem .85rem;min-width:70px;display:block}
+.timer-lbl{font-size:.65rem;color:var(--c3);text-transform:uppercase;letter-spacing:.1em;margin-top:.3rem}
+
+/* ── FAQ ── */
+.faq{padding:6rem 2rem;background:var(--ink2)}
+.faq-inner{max-width:800px;margin:0 auto}
+.faq-list{margin-top:3rem;display:flex;flex-direction:column;gap:.5rem}
+.faq-item{background:var(--ink3);border:1px solid var(--bdr);overflow:hidden}
+.faq-q{padding:1.25rem 1.5rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-weight:500;font-size:.95rem;transition:color .2s}
+.faq-q:hover{color:var(--gold)}
+.faq-icon{font-size:1.2rem;color:var(--gold);transition:transform .3s;min-width:20px;text-align:center}
+.faq-item.open .faq-icon{transform:rotate(45deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .35s ease;color:var(--c2);font-size:.88rem;line-height:1.75;font-weight:300}
+.faq-item.open .faq-a{max-height:300px}
+.faq-a-inner{padding:0 1.5rem 1.25rem}
+
+/* ── GARANTIA ── */
+.garantia{padding:5rem 2rem;background:var(--ink);text-align:center}
+.garantia-inner{max-width:600px;margin:0 auto}
+.garantia-icon{font-size:4rem;margin-bottom:1.5rem;animation:float 3s ease-in-out infinite}
+.garantia-title{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:.06em;margin-bottom:.75rem}
+.garantia-text{color:var(--c2);font-size:.95rem;line-height:1.8;font-weight:300;margin-bottom:2rem}
+
+/* ── FINAL CTA ── */
+.final-cta{padding:6rem 2rem;background:var(--gold);text-align:center;position:relative;overflow:hidden}
+.final-cta::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 10px,rgba(0,0,0,.04) 10px,rgba(0,0,0,.04) 20px)}
+.final-cta-inner{position:relative;z-index:1;max-width:700px;margin:0 auto}
+.final-cta h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.5rem,6vw,4.5rem);letter-spacing:.04em;color:var(--ink);line-height:.95;margin-bottom:1.25rem}
+.final-cta p{color:rgba(8,8,6,.7);font-size:1rem;margin-bottom:2rem;font-weight:300}
+.btn-dark{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.14em;background:var(--ink);color:var(--gold);padding:1rem 3rem;border:none;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block}
+.btn-dark:hover{background:var(--ink2);transform:translateY(-2px)}
+
+/* ── FOOTER ── */
+footer{background:var(--ink2);border-top:1px solid var(--bdr);padding:2rem;text-align:center;color:var(--c4);font-size:.78rem;font-family:'Bebas Neue',sans-serif;letter-spacing:.08em}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .hstat{border:1px solid var(--bdr)!important;margin:.2rem;padding:.75rem 1.25rem}
+  .hero-stats{justify-content:center}
+  nav .btn-secondary-nav{display:none}
+  .timer{gap:.5rem}
+  .timer-num{font-size:1.8rem;min-width:55px;padding:.4rem .6rem}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Agenda<span>Barber</span> Pro</div>
+  <a href="#preco" class="nav-cta">Quero Assinar Agora</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+    <div class="hero-badge fade-up">🔥 Sistema número 1 para barbearias</div>
+    <h1 class="hh hero-h1 fade-up delay-1">
+      Sua Barbearia<br>
+      <span class="gld">Agendando 24h</span><br>
+      <span class="stk">Sem Você Precisar</span>
+    </h1>
+    <p class="hero-sub fade-up delay-2">
+      Chega de perder cliente por <strong>falta de organização</strong>. Com o Agenda Barber Pro, seu cliente agenda sozinho, você recebe no WhatsApp e <strong>fatura mais</strong> sem trabalhar mais.
+    </p>
+    <div class="hero-btns fade-up delay-3">
+      <a href="#preco" class="btn-primary">Começar Agora por R$ 59,90/mês</a>
+      <a href="#como-funciona" class="btn-secondary">Ver como funciona</a>
+    </div>
+    <div class="hero-stats fade-up delay-4">
+      <div class="hstat"><div class="hstat-n">24h</div><div class="hstat-l">Agendamento</div></div>
+      <div class="hstat"><div class="hstat-n">100%</div><div class="hstat-l">Online</div></div>
+      <div class="hstat"><div class="hstat-n">0</div><div class="hstat-l">Fila</div></div>
+      <div class="hstat"><div class="hstat-n">+$$$</div><div class="hstat-l">Faturamento</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- DOR -->
+<section class="pain">
+  <div class="pain-inner">
+    <div class="section-label">A realidade da maioria</div>
+    <h2 class="section-title">Você ainda está<br>perdendo dinheiro assim?</h2>
+    <p class="section-sub">Reconhece alguma dessas situações? São problemas que custam caro todo dia.</p>
+    <div class="pain-grid">
+      <div class="pain-item">
+        <div class="pain-icon">📱</div>
+        <div class="pain-title">WhatsApp lotado de "tem horário?"</div>
+        <div class="pain-text">Você passa o dia respondendo mensagem em vez de cortar cabelo. Tempo perdido que poderia virar dinheiro.</div>
+      </div>
+      <div class="pain-item">
+        <div class="pain-icon">😤</div>
+        <div class="pain-title">Cliente que marca e não aparece</div>
+        <div class="pain-text">Horário vazio, cadeira parada, dinheiro perdido. Sem sistema, você não tem controle nenhum.</div>
+      </div>
+      <div class="pain-item">
+        <div class="pain-icon">📋</div>
+        <div class="pain-title">Agenda no papel ou na memória</div>
+        <div class="pain-text">Confusão, marcação duplicada, cliente reclamando. Isso afasta clientela e mancha sua reputação.</div>
+      </div>
+      <div class="pain-item">
+        <div class="pain-icon">🌙</div>
+        <div class="pain-title">Perdendo clientes fora do horário</div>
+        <div class="pain-text">À meia-noite o cliente quer agendar. Você está dormindo. Ele vai para o concorrente que tem sistema online.</div>
+      </div>
+      <div class="pain-item">
+        <div class="pain-icon">📊</div>
+        <div class="pain-title">Sem controle do que cada barbeiro faz</div>
+        <div class="pain-text">Não sabe quanto cada um fatura, quantos cortes fez, se está batendo meta. Gestão no escuro.</div>
+      </div>
+      <div class="pain-item">
+        <div class="pain-icon">💸</div>
+        <div class="pain-title">Pagando caro por sistemas ruins</div>
+        <div class="pain-text">Sistemas que cobram R$ 200, R$ 300 por mês e oferecem metade do que o Agenda Barber Pro entrega.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUÇÃO -->
+<section class="solution" id="como-funciona">
+  <div class="sol-inner">
+    <div style="text-align:center">
+      <div class="section-label">A solução completa</div>
+      <h2 class="section-title">Tudo que sua barbearia<br><span style="color:var(--gold)">precisa em um lugar só</span></h2>
+      <p class="section-sub" style="margin:0 auto 0">Enquanto você corta cabelo, o sistema trabalha por você.</p>
+    </div>
+    <div class="sol-grid">
+      <div class="sol-item">
+        <div class="sol-num">01</div>
+        <div class="sol-icon">🌐</div>
+        <div class="sol-title">Site Profissional Pronto</div>
+        <div class="sol-text">Seu site no ar em minutos. Com nome da sua barbearia, seus serviços, seus preços e seus barbeiros. Parece feito por agência, sem pagar agência.</div>
+      </div>
+      <div class="sol-item">
+        <div class="sol-num">02</div>
+        <div class="sol-icon">📅</div>
+        <div class="sol-title">Agendamento Online 24h</div>
+        <div class="sol-text">Cliente escolhe o serviço, o barbeiro, o dia e o horário. Tudo sozinho. Você só aparece na hora de cortar.</div>
+      </div>
+      <div class="sol-item">
+        <div class="sol-num">03</div>
+        <div class="sol-icon">💳</div>
+        <div class="sol-title">Pagamento Online ou na Hora</div>
+        <div class="sol-text">Cliente paga pelo Pix antes e garante o horário, ou paga na barbearia. Você escolhe. Chave Pix enviada automaticamente no WhatsApp.</div>
+      </div>
+      <div class="sol-item">
+        <div class="sol-num">04</div>
+        <div class="sol-icon">📲</div>
+        <div class="sol-title">Confirmação Automática no WhatsApp</div>
+        <div class="sol-text">Quando você confirma o agendamento, o cliente recebe todos os detalhes no WhatsApp com um clique. Nada manual.</div>
+      </div>
+      <div class="sol-item">
+        <div class="sol-num">05</div>
+        <div class="sol-icon">📊</div>
+        <div class="sol-title">Dashboard de Cada Barbeiro</div>
+        <div class="sol-text">Veja quantos cortes cada barbeiro fez, quanto faturou no mês e se bateu a meta. Gestão profissional na palma da mão.</div>
+      </div>
+      <div class="sol-item">
+        <div class="sol-num">06</div>
+        <div class="sol-icon">📱</div>
+        <div class="sol-title">App Instalável no Celular</div>
+        <div class="sol-text">Seu cliente instala no celular como app. Ícone na tela inicial, abre em tela cheia. Parece app da App Store sem custo nenhum.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEMONSTRAÇÃO -->
+<section class="demo">
+  <div class="demo-inner">
+    <div class="section-label">Como funciona na prática</div>
+    <h2 class="section-title">O cliente agenda em<br><span style="color:var(--gold)">menos de 2 minutos</span></h2>
+    <p class="section-sub">Simples para o cliente, poderoso para você.</p>
+    <div class="mockup">
+      <div class="mockup-bar">
+        <div class="mockup-dot"></div>
+        <div class="mockup-dot"></div>
+        <div class="mockup-dot"></div>
+        <div class="mockup-url">agendabarber.com.br/?loja=sua-barbearia</div>
+      </div>
+      <div class="mockup-content">
+        <div class="mockup-step active">
+          <div class="step-num">01</div>
+          <div class="step-info"><div class="step-title">Cliente informa nome e WhatsApp</div><div class="step-sub">Dados para receber a confirmação</div></div>
+          <div class="step-check">✓</div>
+        </div>
+        <div class="mockup-step active">
+          <div class="step-num">02</div>
+          <div class="step-info"><div class="step-title">Escolhe o serviço e o barbeiro</div><div class="step-sub">Corte, barba, combo, pigmentação...</div></div>
+          <div class="step-check">✓</div>
+        </div>
+        <div class="mockup-step active">
+          <div class="step-num">03</div>
+          <div class="step-info"><div class="step-title">Seleciona data e horário disponível</div><div class="step-sub">Próximos 7 dias, horários em tempo real</div></div>
+          <div class="step-check">✓</div>
+        </div>
+        <div class="mockup-step active">
+          <div class="step-num">04</div>
+          <div class="step-info"><div class="step-title">Paga online ou na barbearia</div><div class="step-sub">Pix, cartão ou dinheiro no dia</div></div>
+          <div class="step-check">✓</div>
+        </div>
+        <div class="mockup-step" style="border-color:var(--gold);background:rgba(200,146,42,.06)">
+          <div class="step-num" style="color:var(--grn)">✓</div>
+          <div class="step-info"><div class="step-title" style="color:var(--grn)">Agendado! Confirmação no WhatsApp</div><div class="step-sub">Você recebe no painel. Cliente recebe no zap.</div></div>
+          <div style="font-size:1.2rem">🎉</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- URGÊNCIA -->
+<section class="urgency">
+  <div class="urgency-inner">
+    <div class="urgency-title">⚠️ Oferta por tempo limitado</div>
+    <p class="urgency-sub">Preço de lançamento. Pode aumentar a qualquer momento.</p>
+    <div class="timer">
+      <div class="timer-unit"><span class="timer-num" id="t-h">23</span><div class="timer-lbl">Horas</div></div>
+      <div class="timer-unit" style="display:flex;align-items:center;padding-top:.5rem"><span style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--gold)">:</span></div>
+      <div class="timer-unit"><span class="timer-num" id="t-m">59</span><div class="timer-lbl">Min</div></div>
+      <div class="timer-unit" style="display:flex;align-items:center;padding-top:.5rem"><span style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--gold)">:</span></div>
+      <div class="timer-unit"><span class="timer-num" id="t-s">47</span><div class="timer-lbl">Seg</div></div>
+    </div>
+    <a href="#preco" class="btn-primary" style="font-size:1.1rem;padding:.85rem 2.5rem">Garantir minha vaga agora</a>
+  </div>
+</section>
+
+<!-- PREÇO -->
+<section class="pricing" id="preco">
+  <div class="pricing-inner">
+    <div class="section-label">Investimento</div>
+    <h2 class="section-title">Um preço que cabe<br>no seu bolso</h2>
+    <p class="section-sub">Menos que uma consulta de contador. Mais resultado que qualquer outra solução do mercado.</p>
+    <div class="price-card">
+      <div class="price-badge">🔥 MAIS POPULAR — PLANO PRO</div>
+      <div class="price-name">Agenda Barber Pro</div>
+      <div style="margin:1rem 0">
+        <div class="price-val"><sup>R$</sup>59<sub>,90/mês</sub></div>
+      </div>
+      <div class="price-desc">Cancele quando quiser. Sem fidelidade. Sem taxa de adesão.</div>
+      <div class="price-features">
+        <div class="pf"><span class="pf-check">✓</span> Site profissional com seu nome e identidade</div>
+        <div class="pf"><span class="pf-check">✓</span> Agendamento online 24 horas por dia</div>
+        <div class="pf"><span class="pf-check">✓</span> Painel admin completo</div>
+        <div class="pf"><span class="pf-check">✓</span> Dashboard de cada barbeiro com metas</div>
+        <div class="pf"><span class="pf-check">✓</span> Confirmação automática via WhatsApp</div>
+        <div class="pf"><span class="pf-check">✓</span> Pagamento Pix online ou na barbearia</div>
+        <div class="pf"><span class="pf-check">✓</span> App instalável no celular (iOS e Android)</div>
+        <div class="pf"><span class="pf-check">✓</span> Gerenciar barbeiros e serviços</div>
+        <div class="pf"><span class="pf-check">✓</span> Atualizações automáticas incluídas</div>
+        <div class="pf"><span class="pf-check">✓</span> Suporte via WhatsApp</div>
+      </div>
+      <a href="https://pay.kiwify.com.br/8yMzTup" class="price-cta" id="btn-comprar">Quero Começar Agora →</a>
+      <div class="price-guarantee">🔒 Pagamento 100% seguro via Kiwify · Cancele quando quiser</div>
+    </div>
+  </div>
+</section>
+
+<!-- GARANTIA -->
+<section class="garantia">
+  <div class="garantia-inner">
+    <div class="garantia-icon">🛡️</div>
+    <h2 class="garantia-title">Satisfação Garantida</h2>
+    <p class="garantia-text">Experimente por 7 dias. Se não ficar satisfeito com o sistema, devolvemos cada centavo sem fazer nenhuma pergunta. Você não tem nada a perder — só a ganhar.</p>
+    <a href="#preco" class="btn-primary">Começar com garantia de 7 dias</a>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq">
+  <div class="faq-inner">
+    <div style="text-align:center">
+      <div class="section-label">Dúvidas frequentes</div>
+      <h2 class="section-title">Perguntas e Respostas</h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Preciso saber programar para usar? <span class="faq-icon">+</span></div>
+        <div class="faq-a"><div class="faq-a-inner">Não! O sistema vem pronto. Você faz um cadastro simples com nome da barbearia, endereço e WhatsApp. Em menos de 5 minutos está tudo configurado.</div></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Funciona no celular? <span class="faq-icon">+</span></div>
+        <div class="faq-a"><div class="faq-a-inner">Sim! Tanto para você quanto para o seu cliente. O sistema funciona em qualquer dispositivo e ainda pode ser instalado como app no celular — sem precisar de App Store.</div></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Posso adicionar meus próprios barbeiros e serviços? <span class="faq-icon">+</span></div>
+        <div class="faq-a"><div class="faq-a-inner">Sim! No painel admin você adiciona, edita e remove barbeiros e serviços quando quiser. Também pode ajustar preços e descrições a qualquer momento.</div></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Como o cliente recebe a confirmação? <span class="faq-icon">+</span></div>
+        <div class="faq-a"><div class="faq-a-inner">Você clica em "Enviar WhatsApp" no painel e a mensagem completa com todos os detalhes — serviço, barbeiro, data, horário e chave Pix (se for pagamento online) — é enviada automaticamente.</div></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Posso cancelar quando quiser? <span class="faq-icon">+</span></div>
+        <div class="faq-a"><div class="faq-a-inner">Sim. Sem fidelidade, sem multa. Cancele a assinatura quando quiser direto pela Kiwify. Não tem pegadinha.</div></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">E se eu tiver dúvidas depois de assinar? <span class="faq-icon">+</span></div>
+        <div class="faq-a"><div class="faq-a-inner">Suporte via WhatsApp incluído. Você manda mensagem e a gente te ajuda a configurar tudo.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="final-cta-inner">
+    <h2>Sua barbearia merece<br>um sistema profissional</h2>
+    <p>Pare de perder cliente. Pare de responder WhatsApp. Comece a faturar mais com menos esforço.</p>
+    <a href="#preco" class="btn-dark">Assinar Agora por R$ 59,90/mês</a>
+  </div>
+</section>
+
+<footer>
+  <p>© 2025 AGENDA BARBER PRO — TODOS OS DIREITOS RESERVADOS</p>
+</footer>
+
+<script>
+// Timer countdown
+function startTimer(){
+  var end = new Date();
+  end.setHours(23,59,59,0);
+  function update(){
+    var now = new Date(), diff = end - now;
+    if(diff <= 0){ end.setDate(end.getDate()+1); diff = end - now; }
+    var h = Math.floor(diff/3600000);
+    var m = Math.floor((diff%3600000)/60000);
+    var s = Math.floor((diff%60000)/1000);
+    document.getElementById('t-h').textContent = String(h).padStart(2,'0');
+    document.getElementById('t-m').textContent = String(m).padStart(2,'0');
+    document.getElementById('t-s').textContent = String(s).padStart(2,'0');
+  }
+  update();
+  setInterval(update,1000);
+}
+startTimer();
+
+// FAQ toggle
+function toggleFaq(el){
+  var item = el.parentElement;
+  var isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(function(i){ i.classList.remove('open'); });
+  if(!isOpen) item.classList.add('open');
+}
+
+// Scroll animations
+var observer = new IntersectionObserver(function(entries){
+  entries.forEach(function(e){
+    if(e.isIntersecting){ e.target.style.opacity='1'; e.target.style.transform='translateY(0)'; }
+  });
+},{threshold:0.1});
+document.querySelectorAll('.pain-item,.sol-item,.faq-item,.mockup-step').forEach(function(el){
+  el.style.opacity='0';
+  el.style.transform='translateY(20px)';
+  el.style.transition='opacity .5s ease, transform .5s ease';
+  observer.observe(el);
+});
+</script>
+</body>
+</html>
